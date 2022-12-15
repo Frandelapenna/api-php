@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Consumo de API de estados</title>
+    </head>
+
+    <body>
+        <form>
+            <label for="estado">Estado</label>
+            <input type="text" id="estado" name="estado" readonly>
+        </form>
+    </body>
+
+    <script type="text/javascript">
+        // Ejemplo de llamado API filtrando por un valor.
+        let parametros = {
+            "filter": "id_estado = 1"
+        };
+
+        fetch('../apis/estados-api.php/get', {
+            method: 'POST',
+            body: JSON.stringify(parametros),
+            cache: 'no-cache',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(response => response.json())
+            .then(data => {
+                if(data.success) {
+                    document.getElementById("estado").value = data.values[0]["descripcion"];
+                }
+                else
+                    alert(data.values);
+            }).catch((error) => {
+                console.error(error);
+            });
+
+    </script>
+</html>

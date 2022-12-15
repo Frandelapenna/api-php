@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Materias</title>
+    </head>
+
+    <body>
+        <form>
+            <label for="materia">Materia</label>
+            <input type="text" id="materia" name="materia">
+            <button type="button" id="btnGrabar" name="btnGrabar">Grabar</button>
+        </form>
+    </body>
+
+    <script type="text/javascript">
+        
+        // Agrego el evento click del botón grabar.
+        document.getElementById("btnGrabar").addEventListener("click", () => {
+            // Si los datos del formulario son válido entonces, mando a grabar.
+            if (validar_formulario()) {
+                // Armo el array con los datos que le voy a enviar a la API.
+                let data = {
+                    "nombre": document.getElementById("materia").value
+                };
+
+                // Incolo al API que permite insertar un registro en la base
+                fetch('../apis/materias-api.php/insert', {
+                    method: 'POST',
+                    body: JSON.stringify(data),
+                    cache: 'no-cache',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                }).then(response => response.json())
+                    .then(data => {
+                        // Verifico el estado de ejecución del API y
+                        // muestro el mensaje que devuelve el API.
+                        if(data.success) {
+                            alert(data.values["mensaje"]);
+                            blanquear();
+                        }
+                        else
+                            alert(data.values["mensaje"]);
+                    }).catch((error) => {
+                        console.error(error);
+                    });
+            }
+        });
+
+        /**
+         * Valido el formulario para que se ingrese la descripción obligatoriamente.
+        */
+        function validar_formulario() {
+            if (document.getElementById("materia").value === "") {
+                alert("Ingrese el nombre");
+                document.getElementById("materia").focus();
+                return false;
+            }
+
+            return true;
+        }
+
+        function blanquear(){
+            document.getElementById("materia").value = "";
+            document.getElementById("materia").focus();
+        }
+        
+        
+
+    </script>
+</html>
