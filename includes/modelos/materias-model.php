@@ -8,7 +8,7 @@ class MateriasModel {
                     materias ";
 
         if ($xArgs != "")
-            $sql .= "WHERE " . $xArgs["filter"];
+            $sql .= "WHERE id_materia = " . $xArgs["id_materia"];
 
         $result = $objBD->getQuery($sql);
         $objBD->close();

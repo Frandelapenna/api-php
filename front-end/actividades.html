@@ -80,39 +80,41 @@
 
     // Agrego el evento click del botón grabar.
     document.getElementById("btnGrabar").addEventListener("click", () => {
-        // Si los datos del formulario son válido entonces, mando a grabar.
-        if (validar_formulario() && validaSelect()) {
-            // Armo el array con los datos que le voy a enviar a la API.
-            let data = {
-                "id_materia": document.getElementById("materia").value,
-                "id_estados": document.getElementById("estado").value,
-                "descripcion": document.getElementById("descripcion").value,
-                "fecha_entrega": document.getElementById("fecha").value,
-                "notas": document.getElementById("notas").value
-            };
+        //Valido que se ingrese la descripción
+        if (validar_formulario()) {
+            //Valido que se seleccione una materia y un estado
+            if (validaSelect()) {
+                //Creo el objeto actividad
+                let actividad = {
+                    id_materia: document.getElementById("materia").value,
+                    id_estado: document.getElementById("estado").value,
+                    descripcion: document.getElementById("descripcion").value,
+                    fecha: document.getElementById("fecha").value,
+                    notas: document.getElementById("notas").value
+                };
 
-            // Incolo al API que permite insertar un registro en la base
-            fetch('../apis/actividades-api.php/insert', {
-                method: 'POST',
-                body: JSON.stringify(data),
-                cache: 'no-cache',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            }).then(response => response.json())
-                .then(data => {
-                    console.log(data);
-                    // Verifico el estado de ejecución del API y
-                    // muestro el mensaje que devuelve el API.
-                    if(data.success) {
-                        alert(data.values["mensaje"]);
-                        blanquear();
-                    }
-                    else
-                        alert(data.values["mensaje"]);
-                }).catch((error) => {
-                    console.error(error);
-                });
+                //Envío el objeto actividad al api
+                fetch('../apis/actividades-api.php/insert', {
+                        method: 'POST',
+                        cache: 'no-cache',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(actividad)
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data);
+                        if (data.success) {
+                            alert("Actividad guardada correctamente");
+                            blanquear();
+                        } else {
+                            alert("Error al guardar la actividad");
+                        }
+                    }).catch((error) => {
+                        console.error(error);
+                    });
+            }
         }
     });
 
@@ -159,8 +161,14 @@
     }
 
     function blanquear(){
-        document.getElementById("materia").value = "";
-        document.getElementById("materia").focus();
+            document.getElementById("materia").value = -1;
+            document.getElementById("estado").value = -1;
+            document.getElementById("descripcion").value = "";
+            document.getElementById("fecha").value = "";
+            document.getElementById("notas").value = "";
+            document.getElementById("materia").focus();
+        
+        
     }
     
     

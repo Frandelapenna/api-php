@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cambia Actividades</title>
+</head>
+<body>
+    <header>
+        <h3>CAMBIA ACTIVIDADES</h3>
+    </header>
+    <div id="contenedor-formulario">
+        <form action="">
+            <label for="actividad">ACTIVIDAD</label>
+            <select name="actividad" id="actividad">
+                <option value="-1">Seleccione una actividad</option>
+            </select>
+            <label for="materia">MATERIA</label>
+            <select name="materia" id="materia" disabled>
+                <option value="-1">Seleccione una materia</option>
+            </select>
+            <label for="estado">ESTADO</label>
+            <select name="estado" id="estado">
+                <option value="-1">Seleccione un estado</option>
+            </select>
+            <label for="descripcion">DESCRIPCIÓN</label>
+            <input type="text" id="descripcion" name="descripcion" disabled>
+            <label for="fecha">FECHA</label>
+            <input type="input" id="fecha" name="fecha" disabled>
+            <label for="notas">NOTAS</label>
+            <textarea name="notas" id="notas" cols="30" rows="10" disabled></textarea>
+            <input type="button" id="btnGrabar" value="GUARDAR">
+            <input type="button" id="btnCancelar" value="CANCELAR">
+        </form>
+    </div>
+    
+</body>
+<script type="text/javascript">
+
+    // Lleno el select de actividades
+    fetch('../apis/actividades-api.php/get', {
+        method: 'POST',
+        cache: 'no-cache',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        //console.log(data);
+        let select = document.getElementById("actividad");
+        data.values.forEach(element => {
+            let option = document.createElement("option");
+            option.value = element.id_actividad;
+            option.text = element.descripcion;
+            select.appendChild(option);
+        });
+    }).catch((error) => {
+        console.error(error);
+    });
+
+    //Lleno el select de materias
+    fetch('../apis/materias-api.php/get', {
+        method: 'POST',
+        cache: 'no-cache',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        //console.log(data);
+        let select = document.getElementById("materia");
+        data.values.forEach(element => {
+            let option = document.createElement("option");
+            option.value = element.id_materia;
+            option.text = element.nombre;
+            select.appendChild(option);
+        });
+    }).catch((error) => {
+        console.error(error);
+    });
+
+    // Agrego el evento change del select de actividades
+    document.getElementById("actividad").addEventListener("change", () => {
+        // Si el select de actividades tiene un valor distinto de -1 entonces, muestro los datos de la actividad.
+        if (document.getElementById("actividad").value != -1) {
+            // Armo el array con los datos que le voy a enviar a la API.
+            let data = {
+                "id_actividad": document.getElementById("actividad").value
+            };
+
+            // Incolo al API que permite traerme los datos de una actividad.
+            fetch('../apis/actividades-api.php/get', {
+                method: 'POST',
+                body: JSON.stringify(data),
+                cache: 'no-cache',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }).then(response => response.json())
+                .then(data => {
+                    //console.log(data);
+                    // Verifico el estado de ejecución del API y
+                    // muestro el mensaje que devuelve el API.
+                    if(data.success) {
+                        //Muestro los datos de la actividad
+                        document.getElementById("materia").value = data.values[0].id_materia;
+                        document.getElementById("estado").value = data.values[0].id_estado;
+                        document.getElementById("descripcion").value = data.values[0].descripcion;
+                        document.getElementById("fecha").value = data.values[0].fecha_entrega;
+                        document.getElementById("notas").value = data.values[0].notas;
+                    }
+                    else
+                        alert(data.values["mensaje"]);
+                }).catch((error) => {
+                    //console.error(error);
+                });
+        }
+        else {
+            blanquear();
+        }
+    });
+
+    //Lleno el select de estados
+    fetch('../apis/estados-api.php/get', {
+        method: 'POST',
+        cache: 'no-cache',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        //console.log(data);
+        let select = document.getElementById("estado");
+        data.values.forEach(element => {
+            let option = document.createElement("option");
+            option.value = element.id_estado;
+            option.text = element.descripcion;
+            select.appendChild(option);
+        });
+    }).catch((error) => {
+        console.error(error);
+    });
+
+    // Agrego el evento click del botón grabar.
+    document.getElementById("btnGrabar").addEventListener("click", () => {
+        // Si el formulario es válido, entonces, envío los datos al API.
+        if (validar_formulario()) {
+            // Armo el array con los datos que le voy a enviar a la API.
+            let data = {
+                "id_actividad": document.getElementById("actividad").value,
+                "id_materia": document.getElementById("materia").value,
+                "id_estado": document.getElementById("estado").value,
+                "descripcion": document.getElementById("descripcion").value,
+                "fecha_entrega": document.getElementById("fecha").value,
+                "notas": document.getElementById("notas").value
+            };
+
+            // Incolo al API que permite updatear los datos de una actividad.
+            fetch('../apis/actividades-api.php/update', {
+                method: 'POST',
+                body: JSON.stringify(data),
+                cache: 'no-cache',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }).then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    // Verifico el estado de ejecución del API y
+                    // muestro el mensaje que devuelve el API.
+                    if(data.success) {
+                        alert(data.values["mensaje"]);
+                        blanquear();
+                    }
+                    else
+                        alert(data.values["mensaje"]);
+                }).catch((error) => {
+                    console.error(error);
+                });
+        }
+    });
+
+    // Agrego el evento click del botón cancelar.
+    document.getElementById("btnCancelar").addEventListener("click", () => {
+        //Alerta de confirmación
+        if (confirm("¿Está seguro que desea cancelar?")) {
+            blanquear();
+        }
+    });
+
+    /**
+     * Valido el formulario para que se ingrese la descripción obligatoriamente.
+    */
+    function validar_formulario() {
+        if (document.getElementById("materia").value === "") {
+            alert("Ingrese el nombre");
+            document.getElementById("materia").focus();
+            return false;
+        }
+
+        return true;
+    }
+
+    //Valida que haya datos en el select
+    function validaSelect() {
+        if (document.getElementById("estado").value === "-1") {
+            if (document.getElementById("estado").value === "-1"){
+                alert("Seleccione un estado");
+                document.getElementById("estado").focus();
+            }
+            
+            return false;
+        }
+
+        return true;
+    }
+
+    //Funcion que obtiene el nombre de la materia
+
+    function blanquear(){
+        document.getElementById("actividad").value = -1;
+        document.getElementById("materia").value = "";
+        document.getElementById("estado").value = -1;
+        document.getElementById("descripcion").value = "";
+        document.getElementById("fecha").value = "";
+        document.getElementById("notas").value = "";
+        document.getElementById("actividad").focus();
+    }   
+
+</script>
+</html>
