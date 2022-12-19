@@ -17,7 +17,9 @@
                 <option value="-1">Seleccione una actividad</option>
             </select>
             <label for="materia">MATERIA</label>
-            <input type="text" id="input_materia" name="materia" disabled>
+            <select name="materia" id="select_materia" disabled>
+                <option value="-1">Seleccione una materia</option>
+            </select>
             <label for="estado">ESTADO</label>
             <select name="estado" id="select_estado">
                 <option value="-1">Seleccione un estado</option>
@@ -35,6 +37,28 @@
     
 </body>
 <script type="text/javascript">
+
+    //Lleno el select de materia
+    fetch('../apis/materias-api.php/get', {
+        method: 'POST',
+        cache: 'no-cache',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        //console.log(data);
+        let select = document.getElementById("select_materia");
+        data.values.forEach(element => {
+            let option = document.createElement("option");
+            option.value = element.id_materia;
+            option.text = element.nombre;
+            select.appendChild(option);
+        });
+    }).catch((error) => {
+        console.error(error);
+    });
 
     // Lleno el select de actividades
     fetch('../apis/actividades-api.php/get', {
@@ -77,21 +101,21 @@
                 }
             }).then(response => response.json())
                 .then(data => {
-                    //console.log(data);
+                    console.log(data);
                     // Verifico el estado de ejecución del API y
                     // muestro el mensaje que devuelve el API.
                     if(data.success) {
                         //Muestro los datos de la actividad
-                        document.getElementById("input_materia").value = data.values[0].materia;
+                        document.getElementById("select_materia").value = data.values[0].id_materia;
                         document.getElementById("select_estado").value = data.values[0].id_estado;
                         document.getElementById("input_descripcion").value = data.values[0].descripcion;
-                        document.getElementById("input_fecha").value = data.values[0].fecha_entrega;
+                        document.getElementById("input_fecha").value = convertir_fecha(data.values[0].fecha_entrega);
                         document.getElementById("input_notas").value = data.values[0].notas;
                     }
                     else
                         alert(data.values["mensaje"]);
                 }).catch((error) => {
-                    //console.error(error);
+                    console.error(error);
                 });
         }
         else {
@@ -125,16 +149,17 @@
     document.getElementById("btnGrabar").addEventListener("click", () => {
         // Si el formulario es válido, entonces, envío los datos al API.
         if (validar_formulario()) {
+
             // Armo el array con los datos que le voy a enviar a la API.
             let data = {
                 "id_actividad": document.getElementById("select_actividad").value,
-                "id_materia": document.getElementById("input_materia").value,
+                "id_materia": document.getElementById("select_materia").value,
                 "id_estado": document.getElementById("select_estado").value,
                 "descripcion": document.getElementById("input_descripcion").value,
                 "fecha_entrega": document.getElementById("input_fecha").value,
                 "notas": document.getElementById("input_notas").value
             };
-
+            
             // Incolo al API que permite updatear los datos de una actividad.
             fetch('../apis/actividades-api.php/update', {
                 method: 'POST',
@@ -155,6 +180,7 @@
                     else
                         alert(data.values["mensaje"]);
                 }).catch((error) => {
+                    console.log(data);
                     console.error(error);
                 });
         }
@@ -213,6 +239,17 @@
         document.getElementById("input_notas").value = "";
         document.getElementById("select_actividad").focus();
     }   
+
+    //Funcion para convertir la fecha a formato dd/mm/yyyy y sacarle las horas
+    function convertir_fecha(fecha) {
+        let fecha_convertida = new Date(fecha);
+        let dia = fecha_convertida.getDate();
+        let mes = fecha_convertida.getMonth() + 1;
+        let anio = fecha_convertida.getFullYear();
+        let fecha_final = dia + "/" + mes + "/" + anio;
+        return fecha_final;
+    }
+
 
 </script>
 </html>
