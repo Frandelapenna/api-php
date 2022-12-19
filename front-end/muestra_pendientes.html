@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Materias Pendientes</title>
+</head>
+<body>
+    <header>
+        <h3>MATERIAS PENDIENTES</h3>
+    </header>
+    <div id="contenedor-tabla">
+        <table>
+            <thead>
+                <tr>
+                    <th>MATERIA</th>
+                    <th>DESCRIPCION ACTIVIDAD</th>
+                    <th>DESCRIPCIÓN ESTADO</th>
+                    <th>FECHA ENTREGA</th>
+                </tr>
+            </thead>
+            <tbody id="cuerpo-tabla">
+            </tbody>
+        </table>
+        
+    </div>
+    
+</body>
+<script type="text/javascript">
+    //LLeno la tabla
+    fetch('../apis/actividades-api.php/getActividades', {
+            method: 'POST',
+            cache: 'no-cache',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            let tbody = document.getElementById("cuerpo-tabla");
+            data.values.forEach(element => {
+                if (element.id_estado == 1){
+                    let tr = document.createElement("tr");
+                    let tdMateria = document.createElement("td");
+                    tdMateria.innerHTML = element.materia;
+                    let tdDescripcion = document.createElement("td");
+                    tdDescripcion.innerHTML = element.descripcion;
+                    let tdEstado = document.createElement("td");
+                    tdEstado.innerHTML = element.estado;
+                    let tdFecha = document.createElement("td");
+                    tdFecha.innerHTML = element.fecha_entrega;
+                    tr.appendChild(tdMateria);
+                    tr.appendChild(tdDescripcion);
+                    tr.appendChild(tdEstado);
+                    tr.appendChild(tdFecha);
+                    tbody.appendChild(tr);
+                }else{
+                    console.log("No hay actividades pendientes");
+                    alert("Felicidades no hay actividades pendientes!!");
+                }
+                
+            });
+        }).catch((error) => {
+            console.error(error);
+        });
+    
+
+</script>
+</html>

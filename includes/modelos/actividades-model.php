@@ -45,6 +45,31 @@ class ActividadesModel {
         return $aResponse;
     }
 
+    //Me traigo todas las actividades con un inner join con la tabla de estados y materias
+    public function getActividades($xArgs = "") {
+        $objBD = new DBConexion();
+        $sql = "SELECT 
+                    a.id_actividad, a.id_materia, a.id_estado, a.descripcion, a.fecha_entrega, a.notas, e.descripcion as estado, m.nombre as materia
+                FROM 
+                    actividades a
+                INNER JOIN
+                    estados e
+                ON
+                    a.id_estado = e.id_estado 
+                INNER JOIN
+                    materias m
+                ON
+                    a.id_materia = m.id_materia";
+
+
+        if ($xArgs != "")
+            $sql .= "WHERE id_actividad = " . $xArgs["id_actividad"];
+
+        $result = $objBD->getQuery($sql);
+        $objBD->close();
+        return $result;
+    }
+
     public function update($xdata){
         $aResponse = [];
         $objBD = new DBConexion();
@@ -78,5 +103,8 @@ class ActividadesModel {
 
         return $aResponse;
     }
+
+    
+
 }
 ?>

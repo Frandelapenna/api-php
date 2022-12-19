@@ -13,23 +13,21 @@
     <div id="contenedor-formulario">
         <form action="">
             <label for="actividad">ACTIVIDAD</label>
-            <select name="actividad" id="actividad">
+            <select name="actividad" id="select_actividad">
                 <option value="-1">Seleccione una actividad</option>
             </select>
             <label for="materia">MATERIA</label>
-            <select name="materia" id="materia" disabled>
-                <option value="-1">Seleccione una materia</option>
-            </select>
+            <input type="text" id="input_materia" name="materia" disabled>
             <label for="estado">ESTADO</label>
-            <select name="estado" id="estado">
+            <select name="estado" id="select_estado">
                 <option value="-1">Seleccione un estado</option>
             </select>
             <label for="descripcion">DESCRIPCIÓN</label>
-            <input type="text" id="descripcion" name="descripcion" disabled>
+            <input type="text" id="input_descripcion" name="descripcion" disabled>
             <label for="fecha">FECHA</label>
-            <input type="input" id="fecha" name="fecha" disabled>
+            <input type="input" id="input_fecha" name="fecha" disabled>
             <label for="notas">NOTAS</label>
-            <textarea name="notas" id="notas" cols="30" rows="10" disabled></textarea>
+            <textarea name="notas" id="input_notas" cols="30" rows="10" disabled></textarea>
             <input type="button" id="btnGrabar" value="GUARDAR">
             <input type="button" id="btnCancelar" value="CANCELAR">
         </form>
@@ -49,7 +47,7 @@
     .then(response => response.json())
     .then(data => {
         //console.log(data);
-        let select = document.getElementById("actividad");
+        let select = document.getElementById("select_actividad");
         data.values.forEach(element => {
             let option = document.createElement("option");
             option.value = element.id_actividad;
@@ -60,41 +58,19 @@
         console.error(error);
     });
 
-    //Lleno el select de materias
-    fetch('../apis/materias-api.php/get', {
-        method: 'POST',
-        cache: 'no-cache',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        //console.log(data);
-        let select = document.getElementById("materia");
-        data.values.forEach(element => {
-            let option = document.createElement("option");
-            option.value = element.id_materia;
-            option.text = element.nombre;
-            select.appendChild(option);
-        });
-    }).catch((error) => {
-        console.error(error);
-    });
-
     // Agrego el evento change del select de actividades
-    document.getElementById("actividad").addEventListener("change", () => {
+    document.getElementById("select_actividad").addEventListener("change", () => {
         // Si el select de actividades tiene un valor distinto de -1 entonces, muestro los datos de la actividad.
-        if (document.getElementById("actividad").value != -1) {
+        if (document.getElementById("select_actividad").value != -1) {
             // Armo el array con los datos que le voy a enviar a la API.
             let data = {
-                "id_actividad": document.getElementById("actividad").value
+                "id_actividad": document.getElementById("select_actividad").value
             };
 
             // Incolo al API que permite traerme los datos de una actividad.
-            fetch('../apis/actividades-api.php/get', {
+            fetch('../apis/actividades-api.php/getActividades', {
                 method: 'POST',
-                body: JSON.stringify(data),
+                //body: JSON.stringify(data),
                 cache: 'no-cache',
                 headers: {
                     'Content-Type': 'application/json'
@@ -106,11 +82,11 @@
                     // muestro el mensaje que devuelve el API.
                     if(data.success) {
                         //Muestro los datos de la actividad
-                        document.getElementById("materia").value = data.values[0].id_materia;
-                        document.getElementById("estado").value = data.values[0].id_estado;
-                        document.getElementById("descripcion").value = data.values[0].descripcion;
-                        document.getElementById("fecha").value = data.values[0].fecha_entrega;
-                        document.getElementById("notas").value = data.values[0].notas;
+                        document.getElementById("input_materia").value = data.values[0].materia;
+                        document.getElementById("select_estado").value = data.values[0].id_estado;
+                        document.getElementById("input_descripcion").value = data.values[0].descripcion;
+                        document.getElementById("input_fecha").value = data.values[0].fecha_entrega;
+                        document.getElementById("input_notas").value = data.values[0].notas;
                     }
                     else
                         alert(data.values["mensaje"]);
@@ -134,7 +110,7 @@
     .then(response => response.json())
     .then(data => {
         //console.log(data);
-        let select = document.getElementById("estado");
+        let select = document.getElementById("select_estado");
         data.values.forEach(element => {
             let option = document.createElement("option");
             option.value = element.id_estado;
@@ -151,12 +127,12 @@
         if (validar_formulario()) {
             // Armo el array con los datos que le voy a enviar a la API.
             let data = {
-                "id_actividad": document.getElementById("actividad").value,
-                "id_materia": document.getElementById("materia").value,
-                "id_estado": document.getElementById("estado").value,
-                "descripcion": document.getElementById("descripcion").value,
-                "fecha_entrega": document.getElementById("fecha").value,
-                "notas": document.getElementById("notas").value
+                "id_actividad": document.getElementById("select_actividad").value,
+                "id_materia": document.getElementById("input_materia").value,
+                "id_estado": document.getElementById("select_estado").value,
+                "descripcion": document.getElementById("input_descripcion").value,
+                "fecha_entrega": document.getElementById("input_fecha").value,
+                "notas": document.getElementById("input_notas").value
             };
 
             // Incolo al API que permite updatear los datos de una actividad.
@@ -192,27 +168,34 @@
         }
     });
 
-    /**
-     * Valido el formulario para que se ingrese la descripción obligatoriamente.
-    */
-    function validar_formulario() {
-        if (document.getElementById("materia").value === "") {
-            alert("Ingrese el nombre");
-            document.getElementById("materia").focus();
+
+    //Valida que haya datos en el select
+    function validaSelect() {
+        if (document.getElementById("select_actividades").value === "-1" || document.getElementById("select_estado").value === "-1") {
+            if (document.getElementById("select_actividades").value === "-1"){
+                alert("Seleccione una actividadad");
+                document.getElementById("select_actividades").focus();
+            }else {
+                alert("Seleccione un estado");
+                document.getElementById("select_estado").focus();
+            }
+            
             return false;
         }
 
         return true;
     }
 
-    //Valida que haya datos en el select
-    function validaSelect() {
-        if (document.getElementById("estado").value === "-1") {
-            if (document.getElementById("estado").value === "-1"){
-                alert("Seleccione un estado");
-                document.getElementById("estado").focus();
-            }
-            
+    //Valido que el formulario sea correcto
+    function validar_formulario() {
+        if (document.getElementById("select_actividad").value === "-1") {
+            alert("Seleccione una actividad");
+            document.getElementById("select_actividad").focus();
+            return false;
+        }
+        if (document.getElementById("select_estado").value === "-1") {
+            alert("Seleccione un estado");
+            document.getElementById("select_estado").focus();
             return false;
         }
 
@@ -222,13 +205,13 @@
     //Funcion que obtiene el nombre de la materia
 
     function blanquear(){
-        document.getElementById("actividad").value = -1;
-        document.getElementById("materia").value = "";
-        document.getElementById("estado").value = -1;
-        document.getElementById("descripcion").value = "";
-        document.getElementById("fecha").value = "";
-        document.getElementById("notas").value = "";
-        document.getElementById("actividad").focus();
+        document.getElementById("select_actividad").value = -1;
+        document.getElementById("input_materia").value = "";
+        document.getElementById("select_estado").value = -1;
+        document.getElementById("input_descripcion").value = "";
+        document.getElementById("input_fecha").value = "";
+        document.getElementById("input_notas").value = "";
+        document.getElementById("select_actividad").focus();
     }   
 
 </script>
