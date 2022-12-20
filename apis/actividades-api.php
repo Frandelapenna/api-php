@@ -36,5 +36,4 @@ $aResponse["success"] = true;
 $aResponse["values"] = $aResult;
 echo json_encode($aResponse);
 
-
 ?>

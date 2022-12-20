@@ -26,22 +26,18 @@ class ActividadesModel {
             $fecha_entrega = $xdata["fecha_entrega"];            
             $notas = $xdata["notas"];
 
-            $sql = "INSERT INTO actividades (
-                        id_materia, id_estado ,descripcion, fecha_entrega, notas)
-                    VALUES (
-                        '$id_materia','$id_estado','$descripcion','$fecha_entrega','$notas')";
-            var_dump($sql);
+            $sql = "INSERT INTO actividades (id_materia, id_estado, descripcion, fecha_entrega, notas) 
+                    VALUES ('$id_materia', '$id_estado', '$descripcion', '$fecha_entrega', '$notas')";
             $res = $objBD->execute($sql);
             $objBD->close();
             
             if ($res)
-                $aResponse["mensaje"] = "El registro se grabó satisfactoriamente";
+                $aResponse["mensaje"] = "El registro se insertó satisfactoriamente";
             else
-                $aResponse["mensaje"] = "Error al grabar el registro";
+                $aResponse["mensaje"] = "Error al insertar el registro";
         } catch (Exception $ex) {
             $aResponse["mensaje"] = $ex->getMessage();
         }
-
         return $aResponse;
     }
 
@@ -89,10 +85,8 @@ class ActividadesModel {
                         fecha_entrega = '$fecha_entrega',
                         notas = '$notas'
                     WHERE id_actividad = '$id_actividad'";
-            var_dump($sql);
             $res = $objBD->execute($sql);
             $objBD->close();
-            
             if ($res)
                 $aResponse["mensaje"] = "El registro se actualizó satisfactoriamente";
             else
@@ -100,7 +94,6 @@ class ActividadesModel {
         } catch (Exception $ex) {
             $aResponse["mensaje"] = $ex->getMessage();
         }
-
         return $aResponse;
     }
 

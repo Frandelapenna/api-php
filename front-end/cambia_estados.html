@@ -106,14 +106,16 @@
                     // muestro el mensaje que devuelve el API.
                     if(data.success) {
                         //Muestro los datos de la actividad
+                        document.getElementById("select_actividad").value = data.values[0].id_actividad;
                         document.getElementById("select_materia").value = data.values[0].id_materia;
                         document.getElementById("select_estado").value = data.values[0].id_estado;
                         document.getElementById("input_descripcion").value = data.values[0].descripcion;
-                        document.getElementById("input_fecha").value = convertir_fecha(data.values[0].fecha_entrega);
+                        document.getElementById("input_fecha").value = data.values[0].fecha_entrega;
                         document.getElementById("input_notas").value = data.values[0].notas;
-                    }
-                    else
+
+                    }else{console.log(data);
                         alert(data.values["mensaje"]);
+                    }                       
                 }).catch((error) => {
                     console.error(error);
                 });
@@ -179,9 +181,6 @@
                     }
                     else
                         alert(data.values["mensaje"]);
-                }).catch((error) => {
-                    console.log(data);
-                    console.error(error);
                 });
         }
     });
@@ -231,14 +230,13 @@
     //Funcion que obtiene el nombre de la materia
 
     function blanquear(){
-        document.getElementById("select_actividad").value = -1;
-        document.getElementById("input_materia").value = "";
-        document.getElementById("select_estado").value = -1;
+        document.getElementById("select_actividad").value = "-1";
+        document.getElementById("select_materia").value = "-1";
+        document.getElementById("select_estado").value = "-1";
         document.getElementById("input_descripcion").value = "";
         document.getElementById("input_fecha").value = "";
         document.getElementById("input_notas").value = "";
-        document.getElementById("select_actividad").focus();
-    }   
+    }
 
     //Funcion para convertir la fecha a formato dd/mm/yyyy y sacarle las horas
     function convertir_fecha(fecha) {
@@ -246,7 +244,7 @@
         let dia = fecha_convertida.getDate();
         let mes = fecha_convertida.getMonth() + 1;
         let anio = fecha_convertida.getFullYear();
-        let fecha_final = dia + "/" + mes + "/" + anio;
+        let fecha_final = dia + "-" + mes + "-" + anio;
         return fecha_final;
     }
 

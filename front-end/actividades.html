@@ -85,22 +85,23 @@
             //Valido que se seleccione una materia y un estado
             if (validaSelect()) {
                 //Creo el objeto actividad
-                let actividad = {
-                    id_materia: document.getElementById("materia").value,
-                    id_estado: document.getElementById("estado").value,
-                    descripcion: document.getElementById("descripcion").value,
-                    fecha: document.getElementById("fecha").value,
-                    notas: document.getElementById("notas").value
+                let data = {
+                    "id_materia" : document.getElementById("materia").value,
+                    "id_estado" : document.getElementById("estado").value,
+                    "descripcion" : document.getElementById("descripcion").value,
+                    "fecha_entrega" : document.getElementById("fecha").value,
+                    "notas" : document.getElementById("notas").value
                 };
 
                 //Envío el objeto actividad al api
                 fetch('../apis/actividades-api.php/insert', {
                         method: 'POST',
+                        body: JSON.stringify(data),
                         cache: 'no-cache',
                         headers: {
                             'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(actividad)
+                        }
+                        
                     })
                     .then(response => response.json())
                     .then(data => {
