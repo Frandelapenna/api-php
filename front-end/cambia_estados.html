@@ -94,24 +94,33 @@
             // Incolo al API que permite traerme los datos de una actividad.
             fetch('../apis/actividades-api.php/getActividades', {
                 method: 'POST',
-                //body: JSON.stringify(data),
                 cache: 'no-cache',
                 headers: {
                     'Content-Type': 'application/json'
                 }
             }).then(response => response.json())
                 .then(data => {
-                    console.log(data);
+                    //Busco el index de la materia
+                    let index;
+                    let i=0
+                    for (i in data.values){
+                        if (data.values[i].id_actividad == document.getElementById("select_actividad").value){
+                            console.log( "data.value " + data.values[i].id_actividad)
+                            console.log( "document " + document.getElementById("select_actividad").value);
+                            index = i;
+                            console.log("index " + index);
+                        }
+                    }          
                     // Verifico el estado de ejecución del API y
                     // muestro el mensaje que devuelve el API.
                     if(data.success) {
                         //Muestro los datos de la actividad
-                        document.getElementById("select_actividad").value = data.values[0].id_actividad;
-                        document.getElementById("select_materia").value = data.values[0].id_materia;
-                        document.getElementById("select_estado").value = data.values[0].id_estado;
-                        document.getElementById("input_descripcion").value = data.values[0].descripcion;
-                        document.getElementById("input_fecha").value = data.values[0].fecha_entrega;
-                        document.getElementById("input_notas").value = data.values[0].notas;
+                        document.getElementById("select_actividad").value = data.values[index].id_actividad;
+                        document.getElementById("select_materia").value = data.values[index].id_materia;
+                        document.getElementById("select_estado").value = data.values[index].id_estado;
+                        document.getElementById("input_descripcion").value = data.values[index].descripcion;
+                        document.getElementById("input_fecha").value = data.values[index].fecha_entrega;
+                        document.getElementById("input_notas").value = data.values[index].notas;
 
                     }else{console.log(data);
                         alert(data.values["mensaje"]);
